@@ -1,0 +1,177 @@
+Folder Structure
+
+lib/Views/Loginpage
+         /Detailpage Done
+
+lib/Widgets/Colors
+           /Validator
+           /SizeConfig
+           /Widgets Done
+
+assets/images/...
+
+Required Packages :   lottie: ^1.4.1
+  		      google_fonts: ^2.0.0 Done
+
+
+1) Size Config is used for Responsive Size For All Devices
+
+import 'package:flutter/widgets.dart';
+
+class SizeConfig {
+  static MediaQueryData? _mediaQueryData;
+  static double? screenWidth;
+  static double? screenHeight;
+  static double? blockSizeHorizontal;
+  static double? blockSizeVertical;
+  static double? _safeAreaHorizontal;
+  static double? _safeAreaVertical;
+  static double? safeBlockHorizontal;
+  static double? safeBlockVertical;
+
+  void init(BuildContext context){
+    _mediaQueryData = MediaQuery.of(context);
+    screenWidth = _mediaQueryData?.size.width;
+    screenHeight = _mediaQueryData?.size.height;
+    blockSizeHorizontal = screenWidth!/100;
+    blockSizeVertical = screenHeight!/100;
+    _safeAreaHorizontal = _mediaQueryData!.padding.left +
+        _mediaQueryData!.padding.right;
+    _safeAreaVertical = _mediaQueryData!.padding.top +
+        _mediaQueryData!.padding.bottom;
+    safeBlockHorizontal = (screenWidth! - _safeAreaHorizontal!)/100;
+    safeBlockVertical = (screenHeight! - _safeAreaVertical!)/100;
+  }
+}
+
+2) Validation
+
+class Validator{
+  static final RegExp emailRegExp = RegExp(r'[^\@]+\@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+'); // Email Validation Regex
+  static final RegExp passwordRegExp = RegExp(r'^\w{6,}$'); // Password Validation Containing Length 6 or Greater Than 6 Characters
+}
+
+3) Public Colors
+
+import 'package:flutter/material.dart';
+
+const primaryThemeColor =  Color(0xffFFFFFF); // White
+const secondaryThemeColor = Color(0xff36454F); // Charcoal
+
+4) MyTextField Widget
+
+class MyTextField extends StatefulWidget {
+  String myHinttext;
+  bool textVisibility;
+  TextEditingController textEditingController;
+  RegExp regex;
+  String validatorText;
+  IconData icon;
+  bool enableIcon;
+  IconData visibleIcon;
+
+  MyTextField(
+    this.myHinttext,
+    this.textVisibility,
+    this.textEditingController,
+    this.regex,
+    this.validatorText,
+    this.icon,
+    this.enableIcon,
+    this.visibleIcon,
+  );
+
+  @override
+  State<MyTextField> createState() => _MyTextFieldState();
+}
+
+class _MyTextFieldState extends State<MyTextField> {
+  bool changeIcon = true;
+
+  @override
+  Widget build(BuildContext context) {
+    changeIcon = widget.textVisibility;
+    return Align(
+      alignment: Alignment.center,
+      child: Container(
+        width: MediaQuery.of(context).size.width - 20,
+        child: TextFormField(
+          obscureText: widget.textVisibility,
+          keyboardType: TextInputType.emailAddress,
+          controller: widget.textEditingController,
+          style: GoogleFonts.poppins(
+              color: secondaryThemeColor,
+              fontSize: SizeConfig.blockSizeHorizontal! * 3.5),
+          cursorColor: secondaryThemeColor,
+          decoration: InputDecoration(
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: secondaryThemeColor, width: 2.5),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30))),
+              enabledBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: secondaryThemeColor, width: 2.5),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30))),
+              errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red, width: 2.5),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30))),
+              focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: secondaryThemeColor, width: 2.5),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30))),
+              hintText: widget.myHinttext,
+              hintStyle: GoogleFonts.poppins(
+                  color: secondaryThemeColor,
+                  fontSize: SizeConfig.blockSizeHorizontal! * 3.5),
+              suffixIcon: widget.enableIcon
+                  ? changeIcon
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              changeIcon = !changeIcon;
+                              widget.textVisibility = changeIcon;
+                            });
+                          },
+                          child: Icon(
+                            widget.visibleIcon,
+                            color: secondaryThemeColor,
+                            size: SizeConfig.blockSizeHorizontal! * 5.5,
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              changeIcon = !changeIcon;
+                              widget.textVisibility = changeIcon;
+                            });
+                          },
+                          child: Icon(
+                            Icons.visibility,
+                            color: secondaryThemeColor,
+                            size: SizeConfig.blockSizeHorizontal! * 5.5,
+                          ),
+                        )
+                  : SizedBox(),
+              prefixIcon: Icon(
+                widget.icon,
+                color: secondaryThemeColor,
+                size: SizeConfig.blockSizeHorizontal! * 5.5,
+              )),
+          validator: (value) => value!.isEmpty
+              ? widget.validatorText
+              : (widget.regex.hasMatch(value) ? null : widget.validatorText),
+        ),
+      ),
+    );
+  }
+}
